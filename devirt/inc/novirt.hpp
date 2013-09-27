@@ -26,6 +26,7 @@ struct int_novirt : base_novirt
 
 private:
 
+    int arr[10];
     int value;
 };
 
@@ -40,6 +41,7 @@ struct double_novirt : base_novirt
 
 private:
 
+    int arr[10];
     double value;
 };
 

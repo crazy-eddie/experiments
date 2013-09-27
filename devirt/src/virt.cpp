@@ -7,7 +7,7 @@ struct base1 { virtual ~base1() {} };
 struct base2 { virtual ~base2() {} };
 
 
-#define BASE_SWARM base_virt, base0, base1, base2
+#define BASE_SWARM base_virt//, base0, base1, base2
 
 struct int_virt : BASE_SWARM
 {
@@ -19,7 +19,7 @@ struct int_virt : BASE_SWARM
 
 private:
 
-    //int arr[10];
+    int arr[10];
 
     int value;
 };
@@ -32,7 +32,7 @@ struct double_virt : BASE_SWARM
     double get_double() const;
 
 private:
-    //int arr[10];
+    int arr[10];
 
     double value;
 };
