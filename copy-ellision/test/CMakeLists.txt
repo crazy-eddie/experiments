@@ -34,3 +34,4 @@ function(add_boost_test name)
   add_dependencies(tests ${name})
 endfunction()
 
+add_boost_test(ellision ellision.cpp ../src/ellision.cpp)
