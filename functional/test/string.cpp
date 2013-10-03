@@ -40,6 +40,7 @@ BOOST_AUTO_TEST_CASE(string_compare)
 	BOOST_CHECK(!(s1 > s2));
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE(string_append)
 {
 	constexpr string s0{"01234"};
@@ -49,3 +50,4 @@ BOOST_AUTO_TEST_CASE(string_append)
 
 	BOOST_CHECK_EQUAL(s2.length(), 10);
 }
+#endif

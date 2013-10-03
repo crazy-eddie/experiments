@@ -35,3 +35,4 @@ function(add_boost_test name)
 endfunction()
 
 add_boost_test(string string.cpp)
+add_boost_test(array array.cpp)
