@@ -20,8 +20,7 @@ struct array
     template<typename ... U>
     constexpr array(U ... t)
         : arr { t... }
-    {
-    }
+    {}
 
 private:
     T arr[Size];
@@ -83,7 +82,8 @@ array<T, I + 1> push_back( array<T, I> arr
 
 template<typename T, int I>
 constexpr
-array<T, I + 1> push_back(array<T, I> arr, T t) {
+array<T, I + 1> push_back(array<T, I> arr, T t)
+{
     typedef typename build_indices<I>::type indices;
     return push_back(arr, t, indices());
 }
