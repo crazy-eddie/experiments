@@ -34,5 +34,6 @@ function(add_boost_test name)
   add_dependencies(tests ${name})
 endfunction()
 
-add_boost_test(string string.cpp)
-add_boost_test(array array.cpp)
+#add_boost_test(string string.cpp)
+#add_boost_test(array array.cpp)
+add_boost_test(curry curry.cpp)

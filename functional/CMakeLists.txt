@@ -4,7 +4,7 @@ project(functional)
 
 option(CI_BUILD "Build the system under a CI server." OFF)
 
-set(CMAKE_CXX_FLAGS "-O3 -g -std=c++1y -Wall")
+set(CMAKE_CXX_FLAGS "-O3 -g -std=c++11 -Wall")
 
 
 # CMake is sensitive to the name of the command.  It checks that the string 'valgrind' appears in the command.
