@@ -11,7 +11,7 @@ constexpr int strlen(char const* str, int len)
 	return *str == 0
 	    ? len
 		: strlen(str + 1, len + 1)
-	;
+	;;
 }
 
 constexpr bool string_eq( char const* str0
