@@ -37,3 +37,7 @@ endfunction()
 #add_boost_test(string string.cpp)
 #add_boost_test(array array.cpp)
 add_boost_test(curry curry.cpp)
+add_boost_test(delegate delegate.cpp)
+add_boost_test(lazy lazy.cpp)
+
+add_executable(lazy_perf lazy_perf.cpp)
