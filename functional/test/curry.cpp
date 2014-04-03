@@ -7,36 +7,55 @@
 #include <boost/mpl/vector.hpp>
 #include <type_traits>
 
-int fun1(int i) { return i + 5; }
-int fun2(int i, int j) { return i + j; }
-int fun3(int i, char c, double d) { return static_cast<int>(i + c + d); }
+#include <boost/function_types/function_arity.hpp>
+#include <boost/function_types/is_callable_builtin.hpp>
+#include <boost/mpl/prior.hpp>
+#include <boost/function.hpp>
 
-#if 0
-BOOST_AUTO_TEST_CASE(packer)
-{
-    typedef boost::mpl::vector<int,double,char> vtype;
-    BOOST_CHECK((std::is_same< functional::core::sequence_to_pack<vtype>::type
-                             , functional::core::packed<int,double,char> >::value));
-}
+namespace fn = functional::core;
+
+auto fun1 = fn::curry([](int i) { return i; });
+auto fun2 = fn::curry([](int i, char c) { return i + c; });
+auto fun3 = fn::curry([](int i, char c, double d) { return static_cast<int>(i + c + d); });
+
 
 BOOST_AUTO_TEST_CASE(curry)
 {
-    using functional::core::curry;
+	BOOST_CHECK_EQUAL(fun1(5), 5);
+	BOOST_CHECK_EQUAL(fun2(5,'d' - 'a'), 8);
+	BOOST_CHECK_EQUAL(fun3(5, 'd' - 'a', 2), 10);
 
-    BOOST_CHECK_EQUAL(curry(fun2)(5)(3), 8);
-    BOOST_CHECK_EQUAL(curry(fun1)(5), 10);
-    BOOST_CHECK_EQUAL(curry(fun3)(23)('e' - 'a')(32.6), 59);
+	BOOST_CHECK_EQUAL(fun2(5)('d' - 'a'), 8);
 
-    BOOST_CHECK_EQUAL(curry(fun3)(23, 'e' - 'a')(32.6), 59);
+	BOOST_CHECK_EQUAL(fun3(5)('d' - 'a')(2), 10);
+	BOOST_CHECK_EQUAL(fun3(5)('d' - 'a', 2), 10);
+	BOOST_CHECK_EQUAL(fun3(5, 'd' - 'a')(2), 10);
 }
 
-#endif
+BOOST_AUTO_TEST_CASE(curry_return)
+{
+	auto fun = []() { int i = 5; return fun3(i); };
+
+	BOOST_CHECK_EQUAL(fun()('d' - 'a', 2), 10);
+}
+
+BOOST_AUTO_TEST_CASE(auto_curry)
+{
+	auto fun = fn::curry([](auto i, auto j) { return i + j; });
+
+	BOOST_CHECK_EQUAL(fun(5,5), 10);
+	BOOST_CHECK_EQUAL(fun(5)(5), 10);
+}
+
+
+
+int realfun3(int i, char c, double d) { return static_cast<int>(i + c + d); }
 
 BOOST_AUTO_TEST_CASE(invoke)
 {
-    using functional::core::detail_::invoke;
+    using functional::core::detail_::invoke_;
 
     auto args = std::make_tuple(23, 'e' - 'a', 32.6);
 
-    BOOST_CHECK_EQUAL(invoke(fun3, args), 59);
+    BOOST_CHECK_EQUAL(invoke_(realfun3, args), 59);
 }
