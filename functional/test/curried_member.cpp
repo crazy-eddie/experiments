@@ -66,3 +66,23 @@ BOOST_AUTO_TEST_CASE(curried_member)
 	BOOST_CHECK_EQUAL(what.overloaded(4, 'c' - 'a'), 7);
 	BOOST_CHECK_EQUAL(what.overloaded(4, nullptr), 23);
 }
+
+struct what2
+{
+	FUNCTIONAL_CORE_CURRIED_MEMBER(fun, 2, int, (int i0, int i1))
+	{
+		return mem + i0 + i1;
+	}
+
+	what2(int i) : mem(i) {}
+
+private:
+	int mem;
+};
+
+auto fun = [](){ what2 w(22); return w.fun(2); };
+
+BOOST_AUTO_TEST_CASE(temporary)
+{
+	BOOST_CHECK_EQUAL(fun()(5), 29);
+}
