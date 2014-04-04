@@ -94,3 +94,23 @@ BOOST_AUTO_TEST_CASE(temporary)
 {
 	BOOST_CHECK_EQUAL(fun()(5).value(), 29);
 }
+
+
+template < typename T >
+struct templated
+{
+	FUNCTIONAL_CORE_CURRIED_MEMBER(fun, T, (T t0, T t1))
+	{
+		return t0 + t1 + mem;
+	}
+
+	templated(T m) : mem(m) {}
+
+private:
+	T mem;
+};
+
+BOOST_AUTO_TEST_CASE(templated_classes)
+{
+	BOOST_CHECK_EQUAL(templated<int_>(5).fun(2)(6).value(), 13);
+}
