@@ -9,13 +9,13 @@ namespace functional { namespace core {
 namespace detail_ {
 
 template < typename Fun, typename Args, std::size_t ... I >
-auto invoke_(Fun && fun, Args && args, util::index_sequence<I...>)
+auto invoke_(Fun * fun, Args * args, util::index_sequence<I...>)
 {
-    return std::forward<Fun>(fun)(std::get<I>(std::forward<Args>(args))...);
+    return (*fun)(std::get<I>(*args)...);
 }
 
 template < typename Fun, typename Args >
-auto invoke_(Fun && fun, Args && args)
+auto invoke_(Fun * fun, Args * args)
 {
     using decayed_args = typename std::decay<Args>::type;
     using seq =
@@ -24,9 +24,7 @@ auto invoke_(Fun && fun, Args && args)
         	std::tuple_size<decayed_args>::value
         >::type;
 
-    return invoke_( std::forward<Fun>(fun)
-                  , std::forward<Args>(args)
-                  , seq() );
+    return invoke_(fun, args, seq());
 }
 
 template < typename Fun, typename ArgTuple >
@@ -50,7 +48,7 @@ struct curried
 	{
 		static auto invoke(F * fun, A * args)
 		{
-			return detail_::invoke_(*fun,*args);
+			return detail_::invoke_(fun,args);
 		}
 	};
 
@@ -70,9 +68,9 @@ struct curried
 	{}
 
 	template < typename ... Args >
-	auto operator() (Args && ... args)
+	auto operator() (Args ... args)
 	{
-		auto call_tuple = std::tuple_cat(pre_args, std::make_tuple(std::forward<Args>(args)...));
+		auto call_tuple = std::tuple_cat(pre_args, std::make_tuple(args...));
 		return invoker<Fun,decltype(call_tuple)>::invoke(&fun, &call_tuple);
 	}
 private:
