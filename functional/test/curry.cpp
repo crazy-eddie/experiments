@@ -23,37 +23,38 @@ auto fun3 = fn::curry([](fn::int_ i, fn::char_ c, fn::double_ d) { return static
 
 BOOST_AUTO_TEST_CASE(curry)
 {
-	BOOST_CHECK_EQUAL(fun1(5), 5);
-	BOOST_CHECK_EQUAL(fun2(5,'d' - 'a'), 8);
-	BOOST_CHECK_EQUAL(fun3(5, 'd' - 'a', 2), 10);
+	BOOST_CHECK_EQUAL(fun1(5).value(), 5);
+	BOOST_CHECK_EQUAL(fun2(5,'d' - 'a').value(), 8);
+	BOOST_CHECK_EQUAL(fun3(5, 'd' - 'a', 2).value(), 10);
 
-	BOOST_CHECK_EQUAL(fun2(5)('d' - 'a'), 8);
+	BOOST_CHECK_EQUAL(fun2(5)('d' - 'a').value(), 8);
 
-	BOOST_CHECK_EQUAL(fun3(5)('d' - 'a')(2), 10);
-	BOOST_CHECK_EQUAL(fun3(5)('d' - 'a', 2), 10);
-	BOOST_CHECK_EQUAL(fun3(5, 'd' - 'a')(2), 10);
+	BOOST_CHECK_EQUAL(fun3(5)('d' - 'a')(2).value(), 10);
+	BOOST_CHECK_EQUAL(fun3(5)('d' - 'a', 2).value(), 10);
+	BOOST_CHECK_EQUAL(fun3(5, 'd' - 'a')(2).value(), 10);
+
+	fn::int_ val = fun1(5);
+	BOOST_CHECK_EQUAL(val, 5);
 }
 
 BOOST_AUTO_TEST_CASE(curry_return)
 {
 	auto fun = []() { int i = 5; return fun3(i); };
 
-	BOOST_CHECK_EQUAL(fun()('d' - 'a', 2), 10);
+	BOOST_CHECK_EQUAL(fun()('d' - 'a', 2).value(), 10);
 }
 
 BOOST_AUTO_TEST_CASE(auto_curry)
 {
 	auto fun = fn::curry([](auto i, auto j) { return i + j; });
 
-	BOOST_CHECK_EQUAL(fun(5,5), 10);
-	BOOST_CHECK_EQUAL(fun(5)(5), 10);
+	BOOST_CHECK_EQUAL(fun(5,5).value(), 10);
+	BOOST_CHECK_EQUAL(fun(5)(5).value(), 10);
 }
-
 // this is unsolveable so far as I can think of.
 //fn::int_ fun(fn::int_ i) { return i; }
 //fn::int_ fun(fn::int_ i0, fn::int_ i1) { return i0 + i1; }
 
-#if 0
 struct
 {
 	fn::int_ operator() (fn::int_ i) const { return i; }
@@ -67,6 +68,4 @@ BOOST_AUTO_TEST_CASE(overloaded_curry)
 
 	BOOST_CHECK_EQUAL(x.value(), 5);
 	BOOST_CHECK_EQUAL(x(4).value(), 9);
-	BOOST_CHECK_EQUAL(x(7), 12);
 }
-#endif

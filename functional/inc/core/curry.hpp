@@ -37,49 +37,81 @@ struct can_invoke<Fun, std::tuple<Args...> >
 
 }
 
-template < typename Fun, typename PreArgs = std::tuple<> >
-struct curried
+template < typename Fun
+         , typename PreArgs = std::tuple<>
+         , bool can_invoke = detail_::can_invoke<Fun, PreArgs>::value >
+struct curried;
+
+template < typename Fun, typename PreArgs >
+struct curried_base
 {
-	template < typename F, typename A, bool CanInvoke = detail_::can_invoke<F,A>::value >
-	struct invoker;
-
-	template < typename F, typename A >
-	struct invoker<F,A,true>
-	{
-		static auto invoke(F const* fun, A const* args)
-		{
-			return detail_::invoke_(fun,args);
-		}
-	};
-
-	template < typename F, typename A >
-	struct invoker<F,A,false>
-	{
-		static auto invoke(Fun const* fun, A const* args)
-		{
-			return curried<F,A>(*fun,*args);
-		}
-	};
-
-	curried(Fun f) : fun(f) {}
-	curried(Fun f, PreArgs args)
+	curried_base(Fun f) : fun(f) {}
+	curried_base(Fun f, PreArgs args)
 		: fun(f)
 		, pre_args(args)
 	{}
 
 	template < typename ... Args >
-	auto operator() (Args ... args) const
+	auto evaluate (Args ... args) const
 	{
 		auto call_tuple = std::tuple_cat(pre_args, std::make_tuple(args...));
-		return invoker<Fun,decltype(call_tuple)>::invoke(&fun, &call_tuple);
+		return curried<Fun, decltype(call_tuple)>(fun, call_tuple);
 	}
 
-	curried operator() () const { return *this; }
-private:
+protected:
+	~curried_base() {}
 	Fun fun;
 	PreArgs pre_args;
+};
 
+template < typename Fun, typename PreArgs >
+struct curried<Fun,PreArgs,true> : curried_base<Fun,PreArgs>
+{
+	curried(Fun f) : curried_base<Fun,PreArgs>(f) {}
+	curried(Fun f, PreArgs args)
+		: curried_base<Fun,PreArgs>(f,args)
+	{}
 
+	using base = curried_base<Fun,PreArgs>;
+
+	template < typename ... Args >
+	auto operator() (Args ... args) const
+	{
+		return this->evaluate(args...);
+	}
+	curried operator() () const { return *this; }
+
+	using result_type = decltype(detail_::invoke_(std::declval<Fun const*>(), std::declval<PreArgs const*>()));
+
+	result_type value() const
+	{
+		return detail_::invoke_( &this->fun
+				               , &this->pre_args );
+	}
+
+	operator result_type() const { return value(); }
+};
+
+template < typename Fun, typename PreArgs >
+struct curried<Fun,PreArgs,false> : curried_base<Fun,PreArgs>
+{
+	curried(Fun f) : curried_base<Fun,PreArgs>(f) {}
+	curried(Fun f, PreArgs args)
+		: curried_base<Fun,PreArgs>(f,args)
+	{}
+
+	template < typename ... Args >
+	auto operator()(Args ... args) const
+	{
+		return this->evaluate(args...);
+	}
+	curried operator() () const { return *this; }
+
+	using result_type = curried<Fun,PreArgs,false>;
+
+	result_type value() const { return *this; }
+
+	operator result_type() const { return value(); }
 };
 
 
