@@ -116,3 +116,4 @@ BOOST_AUTO_TEST_CASE(std_function)
 	BOOST_CHECK((boost::is_same<boost::mpl::false_, meta::is_callable_with<fun_t,int,double*>::type>::value));
 
 }
+

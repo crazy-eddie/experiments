@@ -13,14 +13,14 @@ namespace {
 
 struct whatever
 {
-	FUNCTIONAL_CORE_CURRIED_MEMBER(inlined, 2, int_, (int_ i, char_ c))
+	FUNCTIONAL_CORE_CURRIED_MEMBER(inlined, int_, (int_ i, char_ c))
 	{
 		return i + c;
 	}
 
-	FUNCTIONAL_CORE_CURRIED_MEMBER(non_inlined, 2, int_, (int_, char_));
+	FUNCTIONAL_CORE_CURRIED_MEMBER(non_inlined, int_, (int_, char_));
 
-	FUNCTIONAL_CORE_CURRIED_MEMBER_CALLER(templated, 2);
+	FUNCTIONAL_CORE_CURRIED_MEMBER_CALLER(templated);
 
 	template < typename T >
 	int_ templated_uncurried(int_ i, T t) const
@@ -28,12 +28,7 @@ struct whatever
 		return i + t + 5;
 	}
 
-	// Doing this of course provides ample opportunity for calling the wrong function
-	// an overloaded that has both a 2 and 3 parameter overload being supplied 2
-	// arguments will always call the 2 parameter overload, it will not return a possible curry.
-	// for now anyway...something to work on (final curry result can itself be some sort callable object)
-	FUNCTIONAL_CORE_CURRIED_MEMBER_CALLER(overloaded, 2);
-	//FUNCTIONAL_CORE_CURRIED_MEMBER_CALLER(overloaded, 3); // not sure this will be possible.  Maybe a more complex object will do.
+	FUNCTIONAL_CORE_CURRIED_MEMBER_CALLER(overloaded);
 
 	int_ overloaded_uncurried(int_ i, char_ c) const
 	{
@@ -76,13 +71,13 @@ BOOST_AUTO_TEST_CASE(curried_member)
 
 	BOOST_CHECK_EQUAL(what.overloaded(4, 'c' - 'a').value(), 7);
 	BOOST_CHECK_EQUAL(what.overloaded(4, nullptr).value(), 23);
-	//BOOST_CHECK_EQUAL(what.overloaded(4, 'c' - 'a', int_(5)).value(), 12);
-	//BOOST_CHECK_EQUAL(what.overloaded(4, 'c' - 'a')(5).value(), 12);
+	BOOST_CHECK_EQUAL(what.overloaded(4, 'c' - 'a', int_(5)).value(), 11);
+	BOOST_CHECK_EQUAL(what.overloaded(4, 'c' - 'a')(5).value(), 11);
 }
 
 struct what2
 {
-	FUNCTIONAL_CORE_CURRIED_MEMBER(fun, 2, int_, (int_ i0, int_ i1))
+	FUNCTIONAL_CORE_CURRIED_MEMBER(fun, int_, (int_ i0, int_ i1))
 	{
 		return mem + i0 + i1;
 	}
