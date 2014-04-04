@@ -15,9 +15,10 @@
 	auto name(Args ... args) const																		\
 	{																									\
 		using functional::core::curry;																	\
-		return curry([this](FUNCTIONAL_CORE_CURMEM_DETAIL_PARMS(arity))									\
+		auto copy = *this;																				\
+		return curry([copy](FUNCTIONAL_CORE_CURMEM_DETAIL_PARMS(arity))									\
 					 {																					\
-					 	 return this->name ## _uncurried(FUNCTIONAL_CORE_CURMEM_DETAIL_ARGS(arity));	\
+					 	 return copy.name ## _uncurried(FUNCTIONAL_CORE_CURMEM_DETAIL_ARGS(arity));		\
 					 })(args...);																		\
 	}
 

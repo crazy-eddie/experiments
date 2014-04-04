@@ -63,6 +63,6 @@ BOOST_AUTO_TEST_CASE(curried_member)
 	BOOST_CHECK_EQUAL(what.templated(4)('c' - 'a'), 11);
 	BOOST_CHECK_EQUAL(what.templated()(4)('c' - 'a'), 11);
 
-	BOOST_CHECK_EQUAL(what.overloaded(4, 'c' - 'a'), 8);
+	BOOST_CHECK_EQUAL(what.overloaded(4, 'c' - 'a'), 7);
 	BOOST_CHECK_EQUAL(what.overloaded(4, nullptr), 23);
 }
