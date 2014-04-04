@@ -9,13 +9,13 @@ namespace functional { namespace core {
 namespace detail_ {
 
 template < typename Fun, typename Args, std::size_t ... I >
-auto invoke_(Fun * fun, Args * args, util::index_sequence<I...>)
+auto invoke_(Fun const* fun, Args const* args, util::index_sequence<I...>)
 {
     return (*fun)(std::get<I>(*args)...);
 }
 
 template < typename Fun, typename Args >
-auto invoke_(Fun * fun, Args * args)
+auto invoke_(Fun const* fun, Args const* args)
 {
     using decayed_args = typename std::decay<Args>::type;
     using seq =
@@ -46,7 +46,7 @@ struct curried
 	template < typename F, typename A >
 	struct invoker<F,A,true>
 	{
-		static auto invoke(F * fun, A * args)
+		static auto invoke(F const* fun, A const* args)
 		{
 			return detail_::invoke_(fun,args);
 		}
@@ -55,7 +55,7 @@ struct curried
 	template < typename F, typename A >
 	struct invoker<F,A,false>
 	{
-		static auto invoke(Fun * fun, A * args)
+		static auto invoke(Fun const* fun, A const* args)
 		{
 			return curried<F,A>(*fun,*args);
 		}
@@ -68,11 +68,13 @@ struct curried
 	{}
 
 	template < typename ... Args >
-	auto operator() (Args ... args)
+	auto operator() (Args ... args) const
 	{
 		auto call_tuple = std::tuple_cat(pre_args, std::make_tuple(args...));
 		return invoker<Fun,decltype(call_tuple)>::invoke(&fun, &call_tuple);
 	}
+
+	curried operator() () const { return *this; }
 private:
 	Fun fun;
 	PreArgs pre_args;
@@ -82,7 +84,7 @@ private:
 
 
 template < typename Fun >
-auto curry(Fun && fun)
+auto curry(Fun fun)
 {
 	return curried<Fun>(fun);
 }

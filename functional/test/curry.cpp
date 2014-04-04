@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../inc/core/curry.hpp"
+#include "../inc/core/fundamentals.hpp"
 
 #include <boost/mpl/vector.hpp>
 #include <type_traits>
@@ -16,10 +17,9 @@
 
 namespace fn = functional::core;
 
-auto fun1 = fn::curry([](int i) { return i; });
-auto fun2 = fn::curry([](int i, char c) { return i + c; });
-auto fun3 = fn::curry([](int i, char c, double d) { return static_cast<int>(i + c + d); });
-
+auto fun1 = fn::curry([](fn::int_ i) { return i; });
+auto fun2 = fn::curry([](fn::int_ i, fn::char_ c) { return static_cast<fn::int_>(i + c); });
+auto fun3 = fn::curry([](fn::int_ i, fn::char_ c, fn::double_ d) { return static_cast<fn::int_>(i + c + d); });
 
 BOOST_AUTO_TEST_CASE(curry)
 {
@@ -48,3 +48,25 @@ BOOST_AUTO_TEST_CASE(auto_curry)
 	BOOST_CHECK_EQUAL(fun(5,5), 10);
 	BOOST_CHECK_EQUAL(fun(5)(5), 10);
 }
+
+// this is unsolveable so far as I can think of.
+//fn::int_ fun(fn::int_ i) { return i; }
+//fn::int_ fun(fn::int_ i0, fn::int_ i1) { return i0 + i1; }
+
+#if 0
+struct
+{
+	fn::int_ operator() (fn::int_ i) const { return i; }
+	fn::int_ operator() (fn::int_ i0, fn::int_ i1) const { return i0 + i1; }
+} fun;
+auto overloaded = fn::curry(fun);
+
+BOOST_AUTO_TEST_CASE(overloaded_curry)
+{
+	auto x = overloaded(5);
+
+	BOOST_CHECK_EQUAL(x.value(), 5);
+	BOOST_CHECK_EQUAL(x(4).value(), 9);
+	BOOST_CHECK_EQUAL(x(7), 12);
+}
+#endif
