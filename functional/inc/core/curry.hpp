@@ -121,6 +121,33 @@ auto curry(Fun fun)
 	return curried<Fun>(fun);
 }
 
+template < typename F1, typename F2 >
+struct compose
+{
+	compose(F1 f1_, F2 f2_)
+		: f1(f1_)
+	    , f2(f2_)
+	{}
+
+	template < typename ... Args >
+	auto operator()(Args ... args) const
+	{
+		return f1(f2(args...).value()).value();
+	}
+
+private:
+	F1 f1;
+	F2 f2;
+};
+
+template < typename Fun1, typename Args1, bool call1
+         , typename Fun2, typename Args2, bool call2 >
+auto operator * (curried<Fun1,Args1,call1> f1, curried<Fun2,Args2,call2> f2)
+{
+	return curry( compose< curried<Fun1,Args1,call1>
+	                     , curried<Fun2,Args2,call2> >(f1,f2));
+}
+
 }}
 
 #endif

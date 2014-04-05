@@ -42,5 +42,6 @@ add_boost_test(lazy lazy.cpp)
 add_boost_test(is_callable_with is_callable_with.cpp)
 add_boost_test(curried_member curried_member.cpp)
 add_boost_test(fundamentals fundamentals.cpp)
+add_boost_test(composition functional_composition.cpp)
 
 add_executable(lazy_perf lazy_perf.cpp)
