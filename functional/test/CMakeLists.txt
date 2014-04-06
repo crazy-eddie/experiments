@@ -45,5 +45,6 @@ add_boost_test(fundamentals fundamentals.cpp)
 add_boost_test(composition functional_composition.cpp)
 add_boost_test(list list.cpp)
 add_boost_test(ref_count ref_count_base.cpp)
+add_boost_test(curry2, curry2.cpp)
 
 add_executable(lazy_perf lazy_perf.cpp)

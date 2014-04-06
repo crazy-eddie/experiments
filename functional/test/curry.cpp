@@ -69,3 +69,57 @@ BOOST_AUTO_TEST_CASE(overloaded_curry)
 	BOOST_CHECK_EQUAL(x.value(), 5);
 	BOOST_CHECK_EQUAL(x(4).value(), 9);
 }
+
+#if 0
+
+/*
+ * Passing by value for everything could potentially ruin performance
+ * for objects implemented with a shared instance impl.  Such shared
+ * instances require shared reference counting, which will need to operate
+ * on an atomic ref count.  If we're making copies even when unnecessary
+ * this will pound the hell out of the cache.
+ */
+namespace {
+
+int count = 0;
+
+struct something
+{
+	something(int i_) : i(i_)
+	{
+		BOOST_MESSAGE("creating something");
+		++count;
+	}
+	~something()
+	{
+		BOOST_MESSAGE("destroying something");
+		--count;
+	}
+	something(something const& s) : i(s.i)
+	{
+		BOOST_MESSAGE("copyng something");
+		++count;
+	}
+
+	int i;
+};
+
+auto fun4 = fn::curry([](something const& s0, something const& s1)
+		              {
+			 		 	 return fn::int_(s0.i + s1.i);
+		              });
+
+auto fun_return = [](){ return fun4(5); };
+}
+
+BOOST_AUTO_TEST_CASE(references)
+{
+	auto x = fun4(something(5),something(6));
+
+	BOOST_CHECK_EQUAL(count, 0);
+
+	auto y = fun4(something(3));
+
+	BOOST_CHECK_EQUAL(count, 1);
+}
+#endif
