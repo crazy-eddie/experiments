@@ -49,7 +49,9 @@ struct list
 		if (!pimpl)
 			throw std::domain_error("Can't call tail on empty.");
 
-		return list(pimpl->next);
+		if (!pimpl->next) return empty;
+
+		return list(*pimpl->next);
 	}
 
 	core::int_ length() const
@@ -67,12 +69,26 @@ struct list
 		return *this;
 	}
 
+	list append(list const& rh) const
+	{
+		if (!pimpl) return rh;
+		return list(head(), tail().append(rh));
+	}
+
+	template < typename Fun >
+	auto map(Fun const& fun) const
+	{
+		if (!pimpl) return empty;
+
+		return list(fun(head()).value(), tail().map(fun));
+	}
+
 	static list<T> const empty;
 
 private:
 	boost::intrusive_ptr<list_detail_::list_impl<T> const> pimpl;
 
-	list(boost::intrusive_ptr<list_detail_::list_impl<T> const>  impl) : pimpl(impl) {}
+	list(list_detail_::list_impl<T> const&  impl) : pimpl(&impl) {}
 };
 template < typename T >
 list<T> const list<T>::empty;
@@ -92,6 +108,15 @@ bool operator != (list<T> const lh, list<T> const rh)
 {
 	return !(lh == rh);
 }
+
+template < typename T >
+list<T> operator + (list<T> const& lh, list<T> const& rh)
+{
+	return lh.append(rh);
+}
+
+template < typename Fun, typename T >
+list<T> fmap_impl(Fun const& f, list<T> const& l) { return l.map(f); }
 
 }}
 

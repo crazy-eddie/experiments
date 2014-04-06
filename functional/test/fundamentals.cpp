@@ -37,3 +37,8 @@ BOOST_AUTO_TEST_CASE(mixed)
 
 	BOOST_CHECK_EQUAL(result, 13);
 }
+
+BOOST_AUTO_TEST_CASE(id_fun)
+{
+	BOOST_CHECK_EQUAL(fn::int_(3), fn::id(fn::int_(3)).value());
+}

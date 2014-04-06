@@ -81,6 +81,7 @@ using int_ = raw_wrapper<int>;
 using double_ = raw_wrapper<double>;
 using char_ = raw_wrapper<char>;
 
+auto id = curry([](auto a) { return a; });
 
 }}
 
