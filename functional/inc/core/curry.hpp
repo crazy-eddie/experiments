@@ -58,6 +58,14 @@ struct curried_base
 		return curried<Fun, decltype(call_tuple)>(fun, call_tuple);
 	}
 
+	template < typename ... Args >
+	auto evaluate (std::tuple<Args...> t) const
+	{
+		using args_tuple_t = std::tuple<typename std::decay<Args>::type...>;
+		auto call_tuple = std::tuple_cat(pre_args, args_tuple_t(t));
+		return curried<Fun, decltype(call_tuple)>(fun, call_tuple);
+	}
+
 protected:
 	~curried_base() {}
 	Fun fun;
@@ -129,10 +137,10 @@ struct compose
 	    , f2(f2_)
 	{}
 
-	template < typename ... Args >
-	auto operator()(Args ... args) const
+	template < typename Arg >
+	auto operator()(Arg const& arg) const
 	{
-		return f1(f2(args...).value()).value();
+		return f1(f2(arg).value());
 	}
 
 private:
@@ -144,8 +152,8 @@ template < typename Fun1, typename Args1, bool call1
          , typename Fun2, typename Args2, bool call2 >
 auto operator * (curried<Fun1,Args1,call1> f1, curried<Fun2,Args2,call2> f2)
 {
-	return curry( compose< curried<Fun1,Args1,call1>
-	                     , curried<Fun2,Args2,call2> >(f1,f2));
+	return compose< curried<Fun1,Args1,call1>
+	              , curried<Fun2,Args2,call2> >(f1,f2);
 }
 
 }}

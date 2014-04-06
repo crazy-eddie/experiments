@@ -76,16 +76,37 @@ BOOST_AUTO_TEST_SUITE(curried_composition)
 
 BOOST_AUTO_TEST_CASE(simple_curry)
 {
-	// Not sure this should be possible.  It is, but by at least Haskell standard
-	// it shouldn't work.
 	auto f = fn::curry([](fn::int_ i) { return i + 5; });
 	auto g = fn::curry([](fn::int_ i, fn::int_ j) { return i + j; });
 
 	auto fg = f * g;
 
-	BOOST_CHECK_EQUAL(fg(3,6).value(), 14);
+	BOOST_CHECK_EQUAL(fg(std::make_tuple(2,4)).value(), 11);
+}
 
-	BOOST_CHECK_EQUAL(fg(3)(6).value(), 14);
+BOOST_AUTO_TEST_CASE(invert_curry)
+{
+	auto f = fn::curry([](fn::int_ i0, fn::int_ i1) { return i0 + i1; });
+	auto g = fn::curry([](fn::int_ i) { return i + 2; });
+
+	auto fg = f * g;
+
+	auto f0 = fg(3);
+
+	BOOST_CHECK_EQUAL(f0(1).value(),6);
+}
+
+BOOST_AUTO_TEST_CASE(everything)
+{
+	auto f = fn::curry([](fn::int_ i0, fn::int_ i1) { return i0 + i1; });
+
+	auto ff = f * f(30);
+
+	BOOST_CHECK_EQUAL(ff(3)(2).value(), 35);
+
+	auto ff2 = f(100) * f(30);
+
+	BOOST_CHECK_EQUAL(ff2(3).value(), 133);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
