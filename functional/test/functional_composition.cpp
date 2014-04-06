@@ -37,6 +37,7 @@ BOOST_AUTO_TEST_CASE(simple_compose)
 {
 	auto fg = f * g;
 
+
 	BOOST_CHECK_EQUAL(fg(33.7), 342);
 }
 BOOST_AUTO_TEST_SUITE_END()
