@@ -4,6 +4,7 @@
 
 #include "../include/crazy/util/pimpl.hpp"
 
+int impl_count = 0;
 
 template < typename TestPolicy >
 struct test_class
@@ -19,13 +20,18 @@ struct test_class
 private:
 	struct impl
 	{
-		impl() : i(), ref_count_() {}
-		impl(int i_) : i(i_), ref_count_() {}
+		impl() : i(), ref_count_()
+		{
+			++impl_count;
+		}
+		impl(int i_) : i(i_), ref_count_() { ++impl_count; }
 
-		impl(impl const& other) : i(other.i), ref_count_() {}
+		impl(impl const& other) : i(other.i), ref_count_() { ++impl_count; }
 
-		int inc() { return ++ref_count_; }
-		int dec() { return --ref_count_; }
+		~impl() { --impl_count; }
+
+		int inc() const { return ++ref_count_; }
+		int dec() const { return --ref_count_; }
 
 		int ref_count() const { return ref_count_; }
 
@@ -35,11 +41,17 @@ private:
 				delete this;
 		}
 
+		bool operator < (impl const& other) const
+		{
+			return i < other.i;
+		}
+
 		int i;
-		int ref_count_;
+		mutable int ref_count_;
 	};
 	crazy::util::pimpl_ptr<impl, TestPolicy> pimpl;
 };
+
 
 BOOST_AUTO_TEST_CASE(basic)
 {
@@ -77,6 +89,8 @@ BOOST_AUTO_TEST_CASE(cow)
 	BOOST_CHECK_EQUAL(t0.ref_count(), 2);
 	BOOST_CHECK_EQUAL(t1.ref_count(), 2);
 
+	BOOST_CHECK_EQUAL(impl_count, 1);
+
 	t1.fun(42);
 
 	BOOST_CHECK_NE(t0.fun(), t1.fun());
@@ -84,10 +98,45 @@ BOOST_AUTO_TEST_CASE(cow)
 	BOOST_CHECK_EQUAL(t0.ref_count(), 1);
 	BOOST_CHECK_EQUAL(t1.ref_count(), 1);
 
+	BOOST_CHECK_EQUAL(impl_count, 2);
+
 	t1.fun(t0.fun());
 
 	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
 
 	BOOST_CHECK_EQUAL(t0.ref_count(), 1);
 	BOOST_CHECK_EQUAL(t1.ref_count(), 1);
+
+	BOOST_CHECK_EQUAL(impl_count, 2);
+}
+
+BOOST_AUTO_TEST_CASE(fly)
+{
+	test_class<crazy::util::pimpl::fly> t0(15);
+	test_class<crazy::util::pimpl::fly> t1 = t0;
+
+	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+
+	BOOST_CHECK_EQUAL(t0.ref_count(), 2);
+	BOOST_CHECK_EQUAL(t1.ref_count(), 2);
+
+	BOOST_CHECK_EQUAL(impl_count, 1);
+
+	t1.fun(42);
+
+	BOOST_CHECK_NE(t0.fun(), t1.fun());
+
+	BOOST_CHECK_EQUAL(t0.ref_count(), 1);
+	BOOST_CHECK_EQUAL(t1.ref_count(), 1);
+
+	BOOST_CHECK_EQUAL(impl_count, 2);
+
+	t1.fun(t0.fun());
+
+	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+
+	BOOST_CHECK_EQUAL(t0.ref_count(), 2);
+	BOOST_CHECK_EQUAL(t1.ref_count(), 2);
+
+	BOOST_CHECK_EQUAL(impl_count, 1);
 }

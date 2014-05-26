@@ -1,6 +1,10 @@
 #ifndef CRAZY_UTIL_PIMPL_HPP
 #define CRAZY_UTIL_PIMPL_HPP
 
+#include <memory>
+#include <set>
+#include <mutex>
+
 namespace crazy { namespace util {
 
 namespace pimpl {
@@ -80,7 +84,92 @@ struct cow
 
 struct fly
 {
+	template < typename T >
+	struct apply
+	{
+		struct type
+		{
+			template < typename ... Arg >
+			static T * create(Arg && ... arg)
+			{
+				T temp(std::forward<T>(arg)...);
+				return flyweight_set.make_ref(temp);
+			}
+
+			static T * copy(T * other)
+			{
+				other->inc();
+				return other;
+			}
+
+			static void destroy(T * ptr)
+			{
+				flyweight_set.remove_ref(ptr);
+			}
+
+			struct mutate_ptr
+			{
+				mutate_ptr(T *& t)
+					: ptr(&t)
+					, temp(*t)
+				{
+				}
+
+				~mutate_ptr()
+				{
+					T * tmp = *ptr;
+
+					*ptr = flyweight_set.make_ref(temp);
+					flyweight_set.remove_ref(tmp);
+				}
+
+				T * operator -> ()
+				{
+					return &temp;
+				}
+
+			private:
+				T ** ptr;
+				T temp;
+			};
+
+			static mutate_ptr mutate(T *& ptr)
+			{
+				return mutate_ptr(ptr);
+			}
+		};
+
+		struct flyweight_set_type
+		{
+			T* make_ref(T const& t)
+			{
+				std::lock_guard<std::mutex> guard(mutex);
+
+				auto it = set.insert(t).first;
+				it->inc();
+				return const_cast<T*>(&*it);
+			}
+			void remove_ref(T * ptr)
+			{
+				std::lock_guard<std::mutex> guard(mutex);
+
+				auto it = set.find(*ptr);
+				if (it == set.end()) throw std::runtime_error("WTF?");
+
+				if (it->dec() == 0)
+					set.erase(it);
+			}
+
+		private:
+			std::mutex mutex;
+			std::set<T> set;
+		};
+		static flyweight_set_type flyweight_set;
+	};
 };
+
+template < typename T >
+typename fly::apply<T>::flyweight_set_type fly::apply<T>::flyweight_set;
 
 }
 
