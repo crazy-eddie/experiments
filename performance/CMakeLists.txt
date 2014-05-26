@@ -37,4 +37,4 @@ IF(DOXYGEN_FOUND)
 ENDIF(DOXYGEN_FOUND)
 
 #add_subdirectory(src)
-add_subdirectory(test)
+add_subdirectory(unit_tests)
