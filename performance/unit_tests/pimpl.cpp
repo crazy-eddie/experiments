@@ -55,88 +55,128 @@ private:
 
 BOOST_AUTO_TEST_CASE(basic)
 {
-	test_class<crazy::util::pimpl::basic> t0(15);
-	test_class<crazy::util::pimpl::basic> t1 = t0;
+	{
+		test_class<crazy::util::pimpl::basic> t0(15);
+		test_class<crazy::util::pimpl::basic> t1 = t0;
+		test_class<crazy::util::pimpl::basic> t2;
 
-	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		t2 = t0;
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 0);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 0);
+		BOOST_CHECK_EQUAL(impl_count, 3);
 
-	t1.fun(42);
+		BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.fun(), t2.fun());
 
-	BOOST_CHECK_NE(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.ref_count(), 0);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 0);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 0);
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 0);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 0);
+		t1.fun(42);
+		t2.fun(19);
 
-	t1.fun(t0.fun());
+		BOOST_CHECK_NE(t0.fun(), t1.fun());
+		BOOST_CHECK_NE(t0.fun(), t2.fun());
 
-	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.ref_count(), 0);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 0);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 0);
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 0);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 0);
+		t1.fun(t0.fun());
+		t2.fun(t0.fun());
+
+		BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.fun(), t2.fun());
+
+		BOOST_CHECK_EQUAL(t0.ref_count(), 0);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 0);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 0);
+	}
+	BOOST_CHECK_EQUAL(impl_count, 0);
 }
 
 
 BOOST_AUTO_TEST_CASE(cow)
 {
-	test_class<crazy::util::pimpl::cow> t0(15);
-	test_class<crazy::util::pimpl::cow> t1 = t0;
+	{
+		test_class<crazy::util::pimpl::cow> t0(15);
+		test_class<crazy::util::pimpl::cow> t1 = t0;
+		test_class<crazy::util::pimpl::cow> t2;
 
-	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		t2 = t0;
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 2);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 2);
+		BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.fun(), t2.fun());
 
-	BOOST_CHECK_EQUAL(impl_count, 1);
+		BOOST_CHECK_EQUAL(t0.ref_count(), 3);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 3);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 3);
 
-	t1.fun(42);
+		BOOST_CHECK_EQUAL(impl_count, 1);
 
-	BOOST_CHECK_NE(t0.fun(), t1.fun());
+		t1.fun(42);
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 1);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 1);
+		BOOST_CHECK_NE(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.fun(), t2.fun());
 
-	BOOST_CHECK_EQUAL(impl_count, 2);
+		BOOST_CHECK_EQUAL(t0.ref_count(), 2);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 1);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 2);
 
-	t1.fun(t0.fun());
+		BOOST_CHECK_EQUAL(impl_count, 2);
 
-	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		t1.fun(t0.fun());
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 1);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 1);
+		BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.fun(), t2.fun());
 
-	BOOST_CHECK_EQUAL(impl_count, 2);
+		BOOST_CHECK_EQUAL(t0.ref_count(), 2);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 1);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 2);
+
+		BOOST_CHECK_EQUAL(impl_count, 2);
+	}
+	BOOST_CHECK_EQUAL(impl_count, 0);
 }
 
 BOOST_AUTO_TEST_CASE(fly)
 {
-	test_class<crazy::util::pimpl::fly> t0(15);
-	test_class<crazy::util::pimpl::fly> t1 = t0;
+	{
+		test_class<crazy::util::pimpl::fly> t0(15);
+		test_class<crazy::util::pimpl::fly> t1 = t0;
+		test_class<crazy::util::pimpl::fly> t2;
 
-	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		t2 = t0;
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 2);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 2);
+		BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.fun(), t2.fun());
 
-	BOOST_CHECK_EQUAL(impl_count, 1);
+		BOOST_CHECK_EQUAL(t0.ref_count(), 3);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 3);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 3);
 
-	t1.fun(42);
+		BOOST_CHECK_EQUAL(impl_count, 1);
 
-	BOOST_CHECK_NE(t0.fun(), t1.fun());
+		t1.fun(42);
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 1);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 1);
+		BOOST_CHECK_NE(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.fun(), t2.fun());
 
-	BOOST_CHECK_EQUAL(impl_count, 2);
+		BOOST_CHECK_EQUAL(t0.ref_count(), 2);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 1);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 2);
 
-	t1.fun(t0.fun());
+		BOOST_CHECK_EQUAL(impl_count, 2);
 
-	BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		t1.fun(t0.fun());
 
-	BOOST_CHECK_EQUAL(t0.ref_count(), 2);
-	BOOST_CHECK_EQUAL(t1.ref_count(), 2);
+		BOOST_CHECK_EQUAL(t0.fun(), t1.fun());
+		BOOST_CHECK_EQUAL(t0.fun(), t2.fun());
 
-	BOOST_CHECK_EQUAL(impl_count, 1);
+		BOOST_CHECK_EQUAL(t0.ref_count(), 3);
+		BOOST_CHECK_EQUAL(t1.ref_count(), 3);
+		BOOST_CHECK_EQUAL(t2.ref_count(), 3);
+
+		BOOST_CHECK_EQUAL(impl_count, 1);
+	}
+	BOOST_CHECK_EQUAL(impl_count, 0);
 }

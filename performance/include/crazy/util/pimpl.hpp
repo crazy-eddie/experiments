@@ -188,6 +188,12 @@ struct pimpl_ptr
 		: ptr(copy_policy::copy(other.ptr))
 	{}
 
+	pimpl_ptr& operator = (pimpl_ptr other)
+	{
+		std::swap(ptr, other.ptr);
+		return *this;
+	}
+
 	~pimpl_ptr() { copy_policy::destroy(ptr); }
 
 	typename copy_policy::mutate_ptr operator -> ()
