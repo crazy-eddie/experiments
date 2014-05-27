@@ -24,6 +24,7 @@ struct basic
 
 			static T * copy(T * other)
 			{
+				if (!other) return nullptr;
 				return new T(*other);
 			}
 
@@ -59,19 +60,23 @@ struct cow
 
 			static T * copy(T * other)
 			{
+				if (!other) return nullptr;
 				other->inc();
 				return other;
 			}
 
 			static void destroy(T * ptr)
 			{
-				ptr->destroy();
+				if (ptr)
+					ptr->destroy();
 			}
 
 			using mutate_ptr = T*;
 
 			static mutate_ptr mutate(T *& ptr)
 			{
+				if (!ptr) return ptr;
+
 				if (ptr->ref_count() == 1) return ptr;
 
 				std::unique_ptr<T> ptr2(create(*ptr));
@@ -98,13 +103,15 @@ struct fly
 
 			static T * copy(T * other)
 			{
+				if (!other) return other;
 				other->inc();
 				return other;
 			}
 
 			static void destroy(T * ptr)
 			{
-				flyweight_set.remove_ref(ptr);
+				if (ptr)
+					flyweight_set.remove_ref(ptr);
 			}
 
 			struct mutate_ptr
@@ -187,6 +194,11 @@ struct pimpl_ptr
 	pimpl_ptr(pimpl_ptr const& other)
 		: ptr(copy_policy::copy(other.ptr))
 	{}
+	pimpl_ptr(pimpl_ptr && other)
+		: ptr()
+	{
+		std::swap(ptr, other.ptr);
+	}
 
 	pimpl_ptr& operator = (pimpl_ptr other)
 	{
