@@ -9,7 +9,7 @@
 
 #include "../include/crazy/util/pimpl.hpp"
 
-#include "test_pimpl.hpp"
+#include "../unit_tests/test_pimpl.hpp"
 
 #include <vector>
 #include <boost/timer/timer.hpp>

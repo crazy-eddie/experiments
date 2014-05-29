@@ -15,4 +15,4 @@ function(add_perf_test name)
   add_dependencies(perf ${name})
 endfunction()
 
-add_perf_test(pimpl_vector pimpl_vector.cpp test_pimpl.cpp)
+add_perf_test(pimpl_vector pimpl_vector.cpp ../unit_tests/test_pimpl.cpp)

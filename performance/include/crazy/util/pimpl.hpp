@@ -65,6 +65,11 @@ struct cow
 				return other;
 			}
 
+			static T * adopt(T * other)
+			{
+				return copy(other);
+			}
+
 			static void destroy(T * ptr)
 			{
 				if (ptr)
@@ -191,6 +196,8 @@ struct pimpl_ptr
 		: ptr(copy_policy::create(std::forward<Arg>(arg)...))
 	{}
 
+	pimpl_ptr(Impl * impl) : ptr(copy_policy::adopt(impl)) {}
+
 	pimpl_ptr(pimpl_ptr const& other)
 		: ptr(copy_policy::copy(other.ptr))
 	{}
@@ -221,6 +228,8 @@ struct pimpl_ptr
 	void swap(pimpl_ptr & other) { std::swap(ptr, other.ptr); }
 
 	Impl const* get() const { return ptr; }
+
+	Impl * clone() const { return new Impl(*ptr); }
 
 private:
 	Impl * ptr;
