@@ -4,6 +4,8 @@
 
 #include "../include/crazy/util/pimpl.hpp"
 
+namespace {
+
 int impl_count = 0;
 
 template < typename TestPolicy >
@@ -51,6 +53,8 @@ private:
 	};
 	crazy::util::pimpl_ptr<impl, TestPolicy> pimpl;
 };
+
+}
 
 
 BOOST_AUTO_TEST_CASE(basic)

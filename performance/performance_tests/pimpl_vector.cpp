@@ -9,6 +9,8 @@
 
 #include "../include/crazy/util/pimpl.hpp"
 
+#include "test_pimpl.hpp"
+
 #include <vector>
 #include <boost/timer/timer.hpp>
 
@@ -61,15 +63,23 @@ BOOST_AUTO_TEST_CASE(nonpimpled)
 	auto vals = create_vector<non_pimpl>(COUNT);
 
 	boost::timer::cpu_timer timer;
+#if 1
 	size_t sz = std::accumulate( std::begin(vals), std::end(vals)
-	                           , 0
+	                           , size_t()
 	                           , [](auto a, auto b)
 	                             {
 								     return a + b.value();
 	                             } );
+#else
+	size_t sz = 0;
+	for (size_t i = 0; i != vals.size(); ++i)
+	{
+		sz += vals[i].value();
+	}
+#endif
 	timer.stop();
 
-	BOOST_CHECK_EQUAL(sz, 18446744071695291584U);
+	BOOST_CHECK_EQUAL(sz, 49999995000000U);
 	BOOST_MESSAGE("Time to run: " << timer.format());
 }
 
@@ -79,15 +89,58 @@ BOOST_AUTO_TEST_CASE(pimpl)
 	auto vals = create_vector<pimpled>(COUNT);
 
 	boost::timer::cpu_timer timer;
+#if 1
+	size_t sz = std::accumulate( std::begin(vals), std::end(vals)
+	                           , size_t()
+	                           , [](auto a, auto b)
+	                             {
+								     return a + b.value();
+	                             } );
+#else
+	size_t sz = 0;
+	for (size_t i = 0; i != vals.size(); ++i)
+	{
+		sz += vals[i].value();
+	}
+#endif
+	timer.stop();
+
+	BOOST_CHECK_EQUAL(sz, 49999995000000U);
+	BOOST_MESSAGE("Time to run: " << timer.format());
+}
+
+test_vector create_test_vector(int num)
+{
+	test_vector vect;
+
+	for (size_t i = 0; i != static_cast<size_t>(num); ++i)
+		vect.push_back(test_class(i));
+
+	return vect;
+}
+
+BOOST_AUTO_TEST_CASE(pimpl_vector)
+{
+	auto vals = create_test_vector(COUNT);
+
+	boost::timer::cpu_timer timer;
+#if 0
 	size_t sz = std::accumulate( std::begin(vals), std::end(vals)
 	                           , 0
 	                           , [](auto a, auto b)
 	                             {
 								     return a + b.value();
 	                             } );
+#else
+	size_t sz = 0;
+	for (size_t i = 0; i != vals.size(); ++i)
+	{
+		sz += vals[i].value();
+	}
+#endif
 	timer.stop();
 
-	BOOST_CHECK_EQUAL(sz, 18446744071695291584U);
+	BOOST_CHECK_EQUAL(sz, 49999995000000U);
 	BOOST_MESSAGE("Time to run: " << timer.format());
 }
 

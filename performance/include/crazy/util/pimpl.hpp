@@ -218,10 +218,26 @@ struct pimpl_ptr
 		return ptr;
 	}
 
+	void swap(pimpl_ptr & other) { std::swap(ptr, other.ptr); }
+
+	Impl const* get() const { return ptr; }
+
 private:
 	Impl * ptr;
 };
 
 }}
+
+#define CRAZY_DECLARE_DEFAULTS(classname) \
+	classname(classname const&); \
+	classname(classname&&); \
+	~classname(); \
+	classname& operator = (classname)
+
+#define CRAZY_DEFINE_DEFAULTS(classname) \
+	classname::classname(classname const& other) : pimpl(other.pimpl) {} \
+	classname::classname(classname && other) : pimpl(std::move(other.pimpl)) {} \
+	classname::~classname() {} \
+	classname& classname::operator = (classname other) { pimpl.swap(other.pimpl); return *this; }
 
 #endif

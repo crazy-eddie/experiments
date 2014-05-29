@@ -35,3 +35,4 @@ function(add_boost_test name)
 endfunction()
 
 add_boost_test(pimpl pimpl.cpp)
+add_boost_test(pimpled_vector pimpled_vector.cpp test_pimpl.cpp)
