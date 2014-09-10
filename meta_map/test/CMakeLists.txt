@@ -34,4 +34,5 @@ function(add_boost_test name)
   add_dependencies(tests ${name})
 endfunction()
 
-add_boost_test(trie test.cpp)
+add_boost_test(trie meta_trie.cpp)
+add_boost_test(map meta_map.cpp)
