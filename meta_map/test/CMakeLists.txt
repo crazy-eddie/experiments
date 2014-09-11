@@ -36,3 +36,4 @@ endfunction()
 
 add_boost_test(trie meta_trie.cpp)
 add_boost_test(map meta_map.cpp)
+add_boost_test(string string.cpp)
