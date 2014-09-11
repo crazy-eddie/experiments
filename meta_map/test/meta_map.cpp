@@ -28,3 +28,18 @@ BOOST_AUTO_TEST_CASE(start_empty)
 	BOOST_CHECK_EQUAL(m2["herp"], "derp");
 	BOOST_CHECK_THROW(m2["world"], std::logic_error);
 }
+
+BOOST_AUTO_TEST_CASE(start_full)
+{
+	auto m0 = meta::map<std::string>
+	(
+	  meta::map_entry<META_STRING("hello")>("world")
+	, meta::map_entry<META_STRING("herp")>("derp")
+	);
+
+	BOOST_CHECK(m0.has("hello"));
+	BOOST_CHECK(m0.has("herp"));
+
+	BOOST_CHECK_EQUAL(m0["hello"], "world");
+	BOOST_CHECK_EQUAL(m0["herp"], "derp");
+}

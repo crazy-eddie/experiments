@@ -85,11 +85,48 @@ auto map_nil<ElemT>::insert(ElemT val) const
 	return map_node<Key,ElemT>(val);
 }
 
+template < typename Key, typename Elem >
+struct map_entry
+{
+	using key = Key;
+	Elem elem;
+	map_entry(Elem e) : elem(std::move(e)) {}
+};
+
+template < typename Map
+         , typename ... Entries >
+struct inserter;
+
+template < typename Map, typename Entry, typename ... Entries >
+struct inserter<Map, Entry, Entries...>
+{
+	static auto insert(Map const& m, Entry e, Entries ... entries)
+	{
+		auto new_map = m.template insert<typename Entry::key>(std::move(e.elem));
+		return inserter<decltype(new_map),Entries...>::insert(new_map,std::move(entries)...);
+	}
+};
+
+template < typename Map >
+struct inserter<Map>
+{
+	static Map insert(Map const& m) { return m; }
+};
 
 }
 
 template < typename ElemT >
 auto map() { return detail_::map_nil<ElemT>{}; }
+
+template < typename Key, typename Elem >
+auto map_entry(Elem e) { return detail_::map_entry<Key,Elem>(std::move(e)); }
+
+template < typename ElemT, typename ... Entries >
+auto map(Entries && ... entries)
+{
+	auto map_start = map<ElemT>();
+	return detail_::inserter<decltype(map_start), Entries...>::insert(map_start,entries...);
+}
 
 }
 
