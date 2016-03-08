@@ -39,6 +39,8 @@ struct string
 {
     using data_type = char const (&) [Size+1];
 
+    static constexpr int sz = Size;
+
     constexpr int size() const
     {
         return Size;

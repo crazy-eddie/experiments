@@ -3,14 +3,18 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../inc/string.hpp"
+#include <boost/mpl/string.hpp>
 
 using namespace functional;
+
+template < int I > struct testit {};
 
 BOOST_AUTO_TEST_CASE(string_length)
 {
 	constexpr string s{"hello!"};
 
 	BOOST_CHECK_EQUAL(s.length(), 6);
+	testit<detail_::strlen("hello",0)> t;
 }
 
 BOOST_AUTO_TEST_CASE(string_equality)
@@ -39,6 +43,7 @@ BOOST_AUTO_TEST_CASE(string_compare)
 	BOOST_CHECK(!(s0 > s2));
 	BOOST_CHECK(!(s1 > s2));
 }
+
 
 #if 0
 BOOST_AUTO_TEST_CASE(string_append)

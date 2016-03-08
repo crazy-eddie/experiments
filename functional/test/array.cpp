@@ -54,4 +54,10 @@ BOOST_AUTO_TEST_CASE(array_as_template_param)
 
     BOOST_CHECK_EQUAL(i1, 3);
     BOOST_CHECK_EQUAL(i2, 2);
+
+    constexpr auto arr2 = make_array(4,5,6);
+    constexpr auto arr3 = arr1 + arr2;
+
+    int i3 = testit<arr3.data()[4]>::value;
+    BOOST_CHECK_EQUAL(i3,5);
 }

@@ -88,6 +88,18 @@ array<T, I + 1> push_back(array<T, I> arr, T t)
     return push_back(arr, t, indices());
 }
 
+template < typename T, int I, int ... Is >
+constexpr array<T, I+1> push_front(array<T,I> arr, T t, indices<Is...>)
+{
+    return array<T,I+1>(t, arr.data()[Is]...);
+}
+template < typename T, int I >
+constexpr array<T,I+1> push_front(array<T,I> arr, T t)
+{
+    using indices = typename build_indices<I>::type;
+    return push_front(arr,t,indices());
+}
+
 template < typename T
          , int I1, int I2
          , int ... Is1
@@ -112,6 +124,12 @@ array<T, I1 + I2> operator + ( array<T,I1> a1
 
     return append(a1, i1(), a2, i2());
 }
+
+template < typename T, int I >
+constexpr array<T,I+1> operator + (array<T,I> a, T t) { return push_back(a,t); }
+
+template < typename T, int I >
+constexpr array<T,I+1> operator + (T t, array<T,I> a) { return push_front(a,t); }
 
 }
 
