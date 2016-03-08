@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/satan/workspace/trie/include/trie.hpp
+boost/optional.hpp
+-
+
+/home/satan/workspace/trie/test/runtime_trie.cpp
+boost/test/unit_test.hpp
+-
+../include/trie.hpp
+/home/satan/workspace/trie/include/trie.hpp
+

@@ -1,0 +1,1 @@
+/usr/bin/c++    -g -std=c++1y -Wall -Werror -pedantic -pedantic-errors   CMakeFiles/runtime_trie.dir/runtime_trie.cpp.o  -o runtime_trie -rdynamic -lboost_unit_test_framework -lboost_timer -lboost_system 
