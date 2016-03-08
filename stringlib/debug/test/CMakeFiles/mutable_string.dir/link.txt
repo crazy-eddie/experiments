@@ -1,1 +1,0 @@
-/usr/bin/c++    -g -std=c++1y -Wall -Werror -pedantic -pedantic-errors    CMakeFiles/mutable_string.dir/mutable_string_test.cpp.o  -o mutable_string -rdynamic -lboost_unit_test_framework -lboost_timer -lboost_system 
