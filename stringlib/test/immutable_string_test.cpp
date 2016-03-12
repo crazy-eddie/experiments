@@ -8,13 +8,13 @@
 
 BOOST_AUTO_TEST_CASE(basic_creation)
 {
-    utilities::string str0{};
+    auto str0 = utility::string{};
 
     BOOST_CHECK(str0.empty());
     BOOST_CHECK_EQUAL(str0.size(), 0);
     BOOST_CHECK(str0.size() == 0);
 
-    utilities::string str1{"Hello world!"};
+    auto str1 = utility::string{"Hello world!"};
 
     BOOST_CHECK(!str1.empty());
     BOOST_CHECK_EQUAL(str1.size(), std::string("Hello world!").size());
@@ -25,24 +25,24 @@ BOOST_AUTO_TEST_CASE(basic_creation)
 
 BOOST_AUTO_TEST_CASE(basic_copy)
 {
-    utilities::string str0 = "Hello World!";
-    utilities::string str1 = str0;
+    auto str0 = utility::string{"Hello World!"};
+    auto str1 = str0;
 
     BOOST_CHECK_EQUAL(str0, str1);
     BOOST_CHECK_EQUAL(str0.data(), str1.data());
 
-    utilities::string str2 = "Hello";
+    auto str2 = utility::string{"Hello"};
     BOOST_CHECK_NE(str0, str2);
 }
 
 BOOST_AUTO_TEST_CASE(substr)
 {
-    utilities::string str0 = "Hello World!";
-    utilities::string str1 = str0.substr(0);
-    utilities::string str2 = str0.substr(0, 4);
-    utilities::string str3 = str0.substr(6);
-    utilities::string str4 = str0.substr(6, 5);
-    utilities::string str5 = str3.substr(0,4);
+    auto str0 = utility::string{"Hello World!"};
+    auto str1 = str0.substr(0);
+    auto str2 = str0.substr(0, 4);
+    auto str3 = str0.substr(6);
+    auto str4 = str0.substr(6, 5);
+    auto str5 = str3.substr(0,4);
 
     BOOST_CHECK_EQUAL(str0, str1);
     BOOST_CHECK_EQUAL(str2, "Hell");
@@ -51,13 +51,15 @@ BOOST_AUTO_TEST_CASE(substr)
     BOOST_CHECK_EQUAL(str5, "Worl");
 }
 
+
 BOOST_AUTO_TEST_CASE(algorithms)
 {
-    utilities::string str0 = "Hello World!";
+    auto str0 = utility::string{"Hello World!"};
 
-    std::string str1{};
+    auto str1 = std::string{};
 
     std::copy(std::begin(str0), std::end(str0), std::back_inserter(str1));
 
     BOOST_CHECK(std::equal(std::begin(str0), std::end(str0), std::begin(str1)));
 }
+

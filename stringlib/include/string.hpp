@@ -5,70 +5,27 @@
 #include <atomic>
 #include <memory>
 
-namespace utilities {
+#include "byte_buffer.hpp"
 
-namespace detail_ {
+namespace utility {
 
-
-struct storage_area
-{
-    int len;
-    char * buffer;
-
-    mutable std::atomic<int> ref_count;
-
-    storage_area() : len(0), buffer(nullptr), ref_count(1) {}
-    storage_area(char const* s)
-        : len(strlen(s))
-        , buffer(new char[len])
-        , ref_count(1)
-    {
-        std::copy(s, s + len, buffer);
-    }
-    ~storage_area() { delete buffer; }
-
-
-    friend void intrusive_ptr_add_ref(storage_area const* x)
-    {
-      x->ref_count.fetch_add(1, std::memory_order_relaxed);
-    }
-    friend void intrusive_ptr_release(storage_area const* x)
-    {
-      if (x->ref_count.fetch_sub(1, std::memory_order_release) == 1) {
-        std::atomic_thread_fence(std::memory_order_acquire);
-        delete x;
-      }
-    }
-};
-
-storage_area * detatch_storage(boost::intrusive_ptr<storage_area> && strg)
-{
-    intrusive_ptr_add_ref(strg.get());
-    storage_area * tmp = strg.get();
-
-    strg.reset();
-
-    return tmp;
-}
-
-
-}
 
 struct string
 {
     string()
-        : storage(new detail_::storage_area())
-        , start(nullptr)
-        , stop(nullptr)
+        : string{byte_buffer{}}
     {}
-    string(char const* s)
-        : storage(new detail_::storage_area(s))
-        , start(storage->buffer)
-        , stop(storage->buffer + storage->len)
+
+    explicit string(char const* s)
+        : string{byte_buffer{s}}
+    {}
+
+    string(byte_buffer && b)
+        : string{new byte_buffer{std::move(b)}, std::begin(b), std::end(b)}
     {}
 
     bool empty() const { return size() == 0; }
-    int size() const { return stop-start; }
+    int size() const { return stop - start; }
 
     char const* data() const { return start; }
 
@@ -85,15 +42,14 @@ struct string
 
 private:
 
-    boost::intrusive_ptr<detail_::storage_area> storage;
+    boost::intrusive_ptr<byte_buffer> storage;
     char const* start;
     char const* stop;
 
-
-    string(boost::intrusive_ptr<detail_::storage_area> const& store, char const* b, char const* e)
-        : storage(store)
-        , start(b)
-        , stop(e)
+    string(boost::intrusive_ptr<byte_buffer> const& store, char const* b, char const* e)
+        : storage{store}
+        , start{b}
+        , stop{e}
     {}
 
     friend struct mutable_string;
@@ -107,6 +63,15 @@ bool operator == (string const& s0, string const& s1)
     return std::equal(std::begin(s0), std::end(s0), std::begin(s1));
 }
 
+bool operator == (string const& s0, char const* cstr)
+{
+    for (auto && c : s0)
+    {
+        if (!*cstr || c != *cstr++) return false;
+    }
+    return *cstr == '\0';
+}
+bool operator == (char const* cstr, string const& s0) { return s0 == cstr; }
 std::ostream & operator << (std::ostream & out, string const& s)
 {
     std::copy(std::begin(s), std::end(s), std::ostream_iterator<char>(out));
@@ -115,33 +80,36 @@ std::ostream & operator << (std::ostream & out, string const& s)
 
 
 
-
 struct mutable_string
 {
-    mutable_string() : storage{new detail_::storage_area{}} {}
-    mutable_string(char const* str) : storage{new detail_::storage_area{str}} {}
+    mutable_string() : storage{new byte_buffer{}} {}
 
+    explicit mutable_string(char const* str) : storage{new byte_buffer{str}} {}
+
+#if 0
     mutable_string(string && str)
         : storage(detail_::detatch_storage(std::move(str.storage)))
     {
         assert(storage->ref_count.load() == 1 && "Please don't move a string that's not really a temporary!");
     }
+#endif
 
 
-    bool empty() const { return size() == 0; }
-    int size() const { return storage->len; }
-    char const* data() const { return storage->buffer; }
+    bool empty() const { return !size(); }
+    int size() const { return storage->size(); }
+    char const* data() const { return begin(); }
 
-    char const* begin() const { return data(); }
-    char const* end() const { return data() + size(); }
+    char const* begin() const { return std::begin(*storage); }
+    char const* end() const { return std::end(*storage); }
 
     mutable_string & operator += (char const* in)
     {
-        return mutable_string(string(*this) + in);
+        storage->append(in);
+        return *this;
     }
 
 private:
-    std::unique_ptr<detail_::storage_area> storage;
+    std::unique_ptr<byte_buffer> storage;
 };
 
 bool operator == (mutable_string const& lh, mutable_string const& rh)
@@ -150,13 +118,21 @@ bool operator == (mutable_string const& lh, mutable_string const& rh)
     return std::equal(std::begin(lh), std::end(lh), std::begin(rh));
 }
 
+bool operator == (mutable_string const& lh, char const* cstr)
+{
+    for (auto && c : lh)
+    {
+        if (!cstr || c != *cstr++) return false;
+    }
+    return *cstr == '\0';
+}
+bool operator == (char const* cstr, mutable_string const& rh) { return rh == cstr; }
 
 std::ostream& operator << (std::ostream & out, mutable_string const& str)
 {
     std::copy(std::begin(str), std::end(str), std::ostream_iterator<char>(out));
     return out;
 }
-
 
 }
 

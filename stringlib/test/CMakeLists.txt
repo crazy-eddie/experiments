@@ -32,5 +32,6 @@ function(add_boost_test name)
   add_dependencies(tests ${name})
 endfunction()
 
-#add_boost_test(immutable_string immutable_string_test.cpp)
-#add_boost_test(mutable_string mutable_string_test.cpp)
+add_boost_test(immutable_string immutable_string_test.cpp)
+add_boost_test(mutable_string mutable_string_test.cpp)
+add_boost_test(byte_buffer byte_buffer_test.cpp)

@@ -6,12 +6,12 @@
 
 BOOST_AUTO_TEST_CASE(basic_construction)
 {
-    utilities::mutable_string str0{};
+    auto str0 = utility::mutable_string{};
 
     BOOST_CHECK(str0.empty());
     BOOST_CHECK_EQUAL(str0.size(), 0);
 
-    utilities::mutable_string str1 = "Hello World!";
+    auto str1 = utility::mutable_string{"Hello World!"};
 
     BOOST_CHECK(!str1.empty());
     BOOST_CHECK_EQUAL(str1.size(), std::string("Hello World!").size());
@@ -23,12 +23,11 @@ BOOST_AUTO_TEST_CASE(basic_construction)
     BOOST_CHECK(std::equal(std::begin(str1), std::end(str1), "Hello World!"));
 }
 
-
 BOOST_AUTO_TEST_CASE(algorithms)
 {
-    utilities::mutable_string str0 = "Hello World!";
+    auto str0 = utility::mutable_string{"Hello World!"};
 
-    std::string str1{};
+    auto str1 = std::string{};
 
     std::copy(std::begin(str0), std::end(str0), std::back_inserter(str1));
 
@@ -37,7 +36,7 @@ BOOST_AUTO_TEST_CASE(algorithms)
 
 BOOST_AUTO_TEST_CASE(appending)
 {
-    utilities::mutable_string str0 = "Hello";
+    auto str0 = utility::mutable_string{"Hello"};
 
     BOOST_CHECK_EQUAL(str0, "Hello");
 
