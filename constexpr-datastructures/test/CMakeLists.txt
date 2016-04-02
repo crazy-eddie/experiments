@@ -28,3 +28,4 @@ endfunction()
 
 add_boost_test(const_array const_array.cpp)
 add_boost_test(indexed_storage indexed_storage.cpp)
+add_boost_test(invocation_list invocation_list.cpp)
